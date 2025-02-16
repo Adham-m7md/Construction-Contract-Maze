@@ -9,22 +9,28 @@ class TextFormFeild extends StatelessWidget {
     this.onChanged,
     this.obscureText = false,
     required this.controller,
+    this.validator,
+    this.focusNode,
   });
   String? hintText;
   bool? obscureText;
   Function(String)? onChanged;
   TextEditingController controller;
+  String? Function(String?)? validator;
+  FocusNode? focusNode;
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText!,
-      validator: (data) {
-        if (data!.isEmpty) {
-          return 'this feild is required';
-        }
-        return null;
-      },
+      focusNode: focusNode,
+      validator: validator ??
+          (data) {
+            if (data!.isEmpty) {
+              return 'هذا الحقل مطلوب'; // رسالة الخطأ الافتراضية
+            }
+            return null;
+          },
       onChanged: onChanged,
       style: const TextStyle(color: kBlackColor),
       decoration: InputDecoration(

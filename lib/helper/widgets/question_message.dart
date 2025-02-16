@@ -1,11 +1,12 @@
-// question_user_message.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 class QuestionUserMessage extends StatefulWidget {
   final String? text;
   final String? answer;
   final bool isAdmin;
   final String messageId;
+  final VoidCallback? onDelete;
 
   const QuestionUserMessage({
     super.key,
@@ -13,6 +14,7 @@ class QuestionUserMessage extends StatefulWidget {
     this.answer,
     this.isAdmin = false,
     required this.messageId,
+    this.onDelete,
   });
 
   @override
@@ -56,6 +58,47 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
     );
   }
 
+  void _showEditAnswerDialog() {
+    final TextEditingController editAnswerController =
+        TextEditingController(text: widget.answer);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Answer'),
+        content: TextField(
+          controller: editAnswerController,
+          decoration: const InputDecoration(
+            hintText: 'Edit your answer',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // إغلاق الـ Dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (editAnswerController.text.isNotEmpty) {
+                await FirebaseFirestore.instance
+                    .collection('messages')
+                    .doc(widget.messageId)
+                    .update({
+                  'answer': editAnswerController.text.trim(),
+                });
+
+                Navigator.of(context).pop(); // إغلاق الـ Dialog
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
@@ -90,7 +133,20 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.format_quote),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Icon(Icons.format_quote),
+                      if (widget.isAdmin)
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outlined,
+                            color: Colors.deepOrangeAccent,
+                          ),
+                          onPressed: widget.onDelete,
+                        ),
+                    ],
+                  ),
                   Center(
                     child: Text(
                       widget.text ?? '',
@@ -125,6 +181,12 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                if (widget.isAdmin)
+                                  IconButton(
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.lightGreen),
+                                    onPressed: _showEditAnswerDialog,
+                                  ),
                               ],
                             ),
                             const SizedBox(height: 8),

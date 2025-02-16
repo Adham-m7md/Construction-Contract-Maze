@@ -27,7 +27,7 @@ class _VideosPageState extends State<VideosPage> {
   // Check if the current user is admin
   bool get isAdmin {
     final user = _auth.currentUser;
-    return user != null && user.email == "admin@gmail.com";
+    return user != null && user.email == '4@test.com';
   }
 
   // Function to show the AlertDialog

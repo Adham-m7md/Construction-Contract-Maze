@@ -1,11 +1,10 @@
-// message_stream_builder.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:maze/helper/widgets/question_message.dart';
 
 class MessageStreamBuilder extends StatefulWidget {
-  const MessageStreamBuilder({Key? key}) : super(key: key);
+  const MessageStreamBuilder({super.key});
 
   @override
   State<MessageStreamBuilder> createState() => _MessageStreamBuilderState();
@@ -43,6 +42,7 @@ class _MessageStreamBuilderState extends State<MessageStreamBuilder> {
             answer: answer,
             isAdmin: isAdmin,
             messageId: message.id,
+            onDelete: () => _deleteMessage(message.id),
           ));
         }
 
@@ -54,7 +54,16 @@ class _MessageStreamBuilderState extends State<MessageStreamBuilder> {
     );
   }
 
+  // دالة للتحقق من أن المستخدم هو الأدمن
   bool checkIfUserIsAdmin(User? user) {
-    return user != null && user.email == 'admin@gmail.com';
+    return user != null && user.email == '4@test.com';
+  }
+
+  // دالة لحذف الرسالة
+  Future<void> _deleteMessage(String messageId) async {
+    await FirebaseFirestore.instance
+        .collection('messages')
+        .doc(messageId)
+        .delete();
   }
 }

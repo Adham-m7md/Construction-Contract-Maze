@@ -6,6 +6,7 @@ import 'package:maze/helper/widgets/constants.dart';
 import 'package:maze/pages/auth.dart';
 import 'package:maze/pages/sign_in_page.dart';
 import 'package:maze/utils/app_directions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUp extends StatefulWidget {
   static String id = 'Signup';
@@ -17,129 +18,233 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  final _emailConntroller = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // مفتاح لإدارة حالة النموذج
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
 
-  final _passwordConntroller = TextEditingController();
+  bool isLoading = false;
 
-  // ignore: non_constant_identifier_names
-  Future SignUpMetode() async {
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: _emailConntroller.text.trim(),
-      password: _passwordConntroller.text.trim(),
-    );
-    // ignore: use_build_context_synchronously
-    Navigator.of(context).pushNamed(Auth.id);
+  // دالة للتحقق من صحة رقم الهاتف
+  bool isValidPhoneNumber(String phone) {
+    // Regex للتحقق من أن الرقم يتكون من 11 رقمًا ويبدأ بـ 01
+    final regex = RegExp(r'^01[0-9]{9}$');
+    return regex.hasMatch(phone);
+  }
+
+  // دالة للتحقق من صحة كلمة المرور
+  bool isValidPassword(String password) {
+    // التحقق من أن كلمة المرور تحتوي على 6 أحرف/أرقام على الأقل
+    return password.length >= 6;
+  }
+
+  Future<void> signUpMetode() async {
+    // تشغيل الفاليديتور يدويًا عند الضغط على الزر
+    if (_formKey.currentState!.validate()) {
+      // إذا كانت جميع الحقول صحيحة
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set({
+          'name': _nameController.text.trim(),
+          'phone': _phoneController.text.trim(),
+          'email': _emailController.text.trim(),
+          'created_at': FieldValue.serverTimestamp(),
+        });
+
+        if (mounted) {
+          Navigator.of(context).pushNamed(Auth.id);
+        }
+      } on FirebaseAuthException catch (e) {
+        showSnackBar(context, "حدث خطأ أثناء التسجيل: ${e.message}");
+      } catch (e) {
+        showSnackBar(context, "حدث خطأ غير متوقع: $e");
+      } finally {
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
+    }
   }
 
   @override
   void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _nameController.dispose();
+    _phoneController.dispose();
     super.dispose();
-    _emailConntroller.dispose();
-    _passwordConntroller.dispose();
   }
-
-  String? email;
-
-  String? password;
-
-  bool isLooding = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 153, 183, 246),
+      backgroundColor: kWhiteColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: context.screenHeight * 0.08,
-              ),
-              Container(
-                height: context.screenHeight * 0.4,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage(kLogo), fit: BoxFit.fill),
+        child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.disabled, // تعطيل التحقق التلقائي
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: context.screenHeight * 0.08),
+                Image.asset(
+                  kLogo,
+                  height: context.screenHeight * 0.3,
                 ),
-              ),
-              SizedBox(
-                height: context.screenHeight * 0.02,
-              ),
-              Padding(
-                padding: EdgeInsets.only(right: context.screenWidth * 0.5),
-                child: const Text(
-                  'Sign Up',
-                  style: TextStyle(
-                      fontSize: 26,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
+                SizedBox(height: context.screenHeight * 0.02),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(width: 8),
+                    Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: 26,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(
-                height: context.screenHeight * 0.014,
-              ),
-              TextFormFeild(
-                controller: _emailConntroller,
-                hintText: 'Email',
-                onChanged: (data) {
-                  email = data;
-                },
-              ),
-              SizedBox(
-                height: context.screenHeight * 0.014,
-              ),
-              TextFormFeild(
-                obscureText: true,
-                hintText: 'password',
-                onChanged: (data) {
-                  password = data;
-                },
-                controller: _passwordConntroller,
-              ),
-              SizedBox(
-                height: context.screenHeight * 0.02,
-              ),
-              Button(
-                onTap: SignUpMetode,
-                buttonText: 'Sign Up',
-              ),
-              SizedBox(
-                height: context.screenHeight * 0.014,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'already have an account  ',
-                    style: TextStyle(
+                SizedBox(height: context.screenHeight * 0.014),
+                TextFormFeild(
+                  hintText: 'Name',
+                  onChanged: (data) {
+                    setState(() {
+                      _nameController.text = data;
+                    });
+                  },
+                  controller: _nameController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'الاسم مطلوب';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: context.screenHeight * 0.02),
+                TextFormFeild(
+                  hintText: 'Phone',
+                  onChanged: (data) {
+                    setState(() {
+                      _phoneController.text = data;
+                    });
+                  },
+                  controller: _phoneController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'رقم الهاتف مطلوب';
+                    }
+                    if (!isValidPhoneNumber(value)) {
+                      return 'رقم الهاتف غير صحيح. يجب أن يتكون من 11 رقمًا ويبدأ بـ 01';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: context.screenHeight * 0.02),
+                TextFormFeild(
+                  hintText: 'Email',
+                  onChanged: (data) {
+                    setState(() {
+                      _emailController.text = data;
+                    });
+                  },
+                  controller: _emailController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'البريد الإلكتروني مطلوب';
+                    }
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
+                      return 'البريد الإلكتروني غير صحيح';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: context.screenHeight * 0.014),
+                TextFormFeild(
+                  obscureText: true,
+                  hintText: 'Password',
+                  onChanged: (data) {
+                    setState(() {
+                      _passwordController.text = data;
+                    });
+                  },
+                  controller: _passwordController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'كلمة المرور مطلوبة';
+                    }
+                    if (!isValidPassword(value)) {
+                      return 'كلمة المرور يجب أن تحتوي على 6 أحرف/أرقام على الأقل';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: context.screenHeight * 0.02),
+                isLoading
+                    ? const CircularProgressIndicator() // عرض مؤشر التحميل
+                    : Button(
+                        onTap: signUpMetode,
+                        buttonText: 'Sign Up',
+                      ),
+                SizedBox(height: context.screenHeight * 0.014),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Already have an account? ',
+                      style: TextStyle(
                         fontSize: 18,
                         color: kBlackColor,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacementNamed(context, SignIn.id);
-                    },
-                    child: const Text(
-                      'SIGN IN',
-                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacementNamed(context, SignIn.id);
+                      },
+                      child: const Text(
+                        'SIGN IN',
+                        style: TextStyle(
                           fontSize: 16,
                           color: kPrimaryColor,
-                          fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  )
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void showSnackBar(BuildContext context, String massege) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(massege)));
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red, // لون الخلفية للرسالة
+      ),
+    );
   }
 }
