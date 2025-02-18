@@ -1,7 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:maze/pages/home_page.dart';
+
 import 'package:maze/pages/auth.dart';
+import 'package:maze/pages/home_page.dart';
 import 'package:maze/pages/info_page.dart';
 import 'package:maze/pages/sign_in_page.dart';
 import 'package:maze/pages/sign_up_page.dart';

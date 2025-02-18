@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 class QuestionUserMessage extends StatefulWidget {
   final String? text;
   final String? answer;
+  final String? country;
+  final String? username; // إضافة اسم المستخدم
   final bool isAdmin;
   final String messageId;
   final VoidCallback? onDelete;
 
   const QuestionUserMessage({
     super.key,
+    this.country,
+    this.username,
     this.text,
     this.answer,
     this.isAdmin = false,
@@ -113,6 +117,8 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
 
         final messageData = snapshot.data!.data() as Map<String, dynamic>?;
         final answer = messageData?['answer'] ?? '';
+        final username = 'Anonymous'; // اسم المستخدم
+        final country = messageData?['country'] ?? ''; // البلد
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
@@ -134,9 +140,37 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Icon(Icons.format_quote),
+                      if (username.isNotEmpty || country.isNotEmpty)
+                        Expanded(
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (username.isNotEmpty)
+                                  Text(
+                                    username,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                if (country.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      '($country)',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
                       if (widget.isAdmin)
                         IconButton(
                           icon: const Icon(
@@ -147,6 +181,8 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
                         ),
                     ],
                   ),
+                  // عرض اسم المستخدم والبلد
+
                   Center(
                     child: Text(
                       widget.text ?? '',

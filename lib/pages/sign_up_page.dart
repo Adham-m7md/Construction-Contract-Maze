@@ -133,7 +133,7 @@ class _SignUpState extends State<SignUp> {
                   controller: _nameController,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'الاسم مطلوب';
+                      return 'enter your name';
                     }
                     return null;
                   },
@@ -149,10 +149,10 @@ class _SignUpState extends State<SignUp> {
                   controller: _phoneController,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'رقم الهاتف مطلوب';
+                      return 'enter your phone number';
                     }
                     if (!isValidPhoneNumber(value)) {
-                      return 'رقم الهاتف غير صحيح. يجب أن يتكون من 11 رقمًا ويبدأ بـ 01';
+                      return 'ex: 01234567890';
                     }
                     return null;
                   },
@@ -168,7 +168,7 @@ class _SignUpState extends State<SignUp> {
                   controller: _emailController,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'البريد الإلكتروني مطلوب';
+                      return 'email is required';
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                         .hasMatch(value)) {
@@ -189,10 +189,10 @@ class _SignUpState extends State<SignUp> {
                   controller: _passwordController,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'كلمة المرور مطلوبة';
+                      return 'password is required';
                     }
                     if (!isValidPassword(value)) {
-                      return 'كلمة المرور يجب أن تحتوي على 6 أحرف/أرقام على الأقل';
+                      return 'not less than 6 letters';
                     }
                     return null;
                   },
@@ -231,6 +231,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ],
                 ),
+                SizedBox(height: context.screenHeight * 0.06),
               ],
             ),
           ),

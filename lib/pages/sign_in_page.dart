@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:maze/helper/widgets/CustomButton.dart';
 import 'package:maze/helper/widgets/CustomTextFeild.dart';
 import 'package:maze/helper/widgets/constants.dart';
+import 'package:maze/pages/home_page.dart';
+import 'package:maze/pages/qestions_page.dart';
 import 'package:maze/utils/app_directions.dart';
 import 'package:maze/pages/sign_up_page.dart';
 
@@ -16,16 +18,25 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  final _formKey = GlobalKey<FormState>(); // مفتاح لإدارة حالة النموذج
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // التحقق مما إذا كان المستخدم مسجل دخول بالفعل بطريقة آمنة
+    Future.delayed(Duration.zero, () {
+      if (mounted && FirebaseAuth.instance.currentUser != null) {
+        Navigator.of(context).pushReplacementNamed(QuestionsPages.id);
+      }
+    });
+  }
+
   Future<void> signInMetode() async {
-    // تشغيل الفاليديتور يدويًا عند الضغط على الزر
     if (_formKey.currentState!.validate()) {
-      // إذا كانت جميع الحقول صحيحة
       setState(() {
         isLoading = true;
       });
@@ -35,8 +46,12 @@ class _SignInState extends State<SignIn> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+
+        // استخدام pushReplacementNamed بدلاً من pushNamed
+        if (mounted) {
+          Navigator.of(context).pushNamed(HomePage.id);
+        }
       } on FirebaseAuthException catch (e) {
-        // التعامل مع أخطاء Firebase Auth
         String errorMessage;
         switch (e.code) {
           case 'invalid-email':
@@ -54,12 +69,20 @@ class _SignInState extends State<SignIn> {
           case 'invalid-credential':
             errorMessage = 'كلمة المرور غير صحيحة';
             break;
+          case 'account-exists-with-different-credential':
+          case 'email-already-in-use':
+            errorMessage = 'أنت مسجل دخول بالفعل';
+            break;
           default:
-            errorMessage = 'حدث خطأ أثناء تسجيل الدخول: ${e.message}';
+          // errorMessage = 'حدث خطأ أثناء تسجيل الدخول: ${e.message}';
         }
-        showSnackBar(context, errorMessage);
+        if (mounted) {
+          // showSnackBar(context, errorMessage);
+        }
       } catch (e) {
-        showSnackBar(context, "حدث خطأ غير متوقع: $e");
+        if (mounted) {
+          // showSnackBar(context, "حدث خطأ غير متوقع: $e");
+        }
       } finally {
         if (mounted) {
           setState(() {
@@ -70,7 +93,6 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-  // دالة لعرض Dialog لإعادة تعيين كلمة المرور
   Future<void> _showResetPasswordDialog(BuildContext context) async {
     final _resetEmailController = TextEditingController();
 
@@ -113,7 +135,7 @@ class _SignInState extends State<SignIn> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // إغلاق الـ Dialog
+                Navigator.of(context).pop();
               },
               child: const Text('cancel'),
             ),
@@ -124,13 +146,19 @@ class _SignInState extends State<SignIn> {
                     await FirebaseAuth.instance.sendPasswordResetEmail(
                       email: _resetEmailController.text.trim(),
                     );
-                    showSnackBar(context,
-                        'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني');
-                    Navigator.of(context).pop(); // إغلاق الـ Dialog
+                    if (mounted) {
+                      showSnackBar(context,
+                          'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني');
+                      Navigator.of(context).pop();
+                    }
                   } on FirebaseAuthException catch (e) {
-                    showSnackBar(context, "حدث خطأ: ${e.message}");
+                    if (mounted) {
+                      showSnackBar(context, "حدث خطأ: ${e.message}");
+                    }
                   } catch (e) {
-                    showSnackBar(context, "حدث خطأ غير متوقع: $e");
+                    if (mounted) {
+                      showSnackBar(context, "حدث خطأ غير متوقع: $e");
+                    }
                   }
                 } else {
                   showSnackBar(context, 'الرجاء إدخال بريد إلكتروني صحيح');
@@ -158,15 +186,15 @@ class _SignInState extends State<SignIn> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Form(
-          key: _formKey, // ربط النموذج بالمفتاح
-          autovalidateMode: AutovalidateMode.disabled, // تعطيل التحقق التلقائي
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.disabled,
           child: SingleChildScrollView(
             child: Column(
               children: [
                 SizedBox(height: context.screenHeight * 0.08),
                 Image.asset(
                   kLogo,
-                  height: context.screenHeight * 0.45,
+                  height: context.screenHeight * 0.4,
                 ),
                 SizedBox(height: context.screenHeight * 0.02),
                 const Row(
@@ -194,11 +222,11 @@ class _SignInState extends State<SignIn> {
                   },
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'البريد الإلكتروني مطلوب';
+                      return 'ex: exampel@gmail.com';
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                         .hasMatch(value)) {
-                      return 'البريد الإلكتروني غير صحيح';
+                      return 'ex: exampel@gmail.com';
                     }
                     return null;
                   },
@@ -215,7 +243,7 @@ class _SignInState extends State<SignIn> {
                   },
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'كلمة المرور مطلوبة';
+                      return 'not less than 6 letters';
                     }
                     return null;
                   },
@@ -226,7 +254,7 @@ class _SignInState extends State<SignIn> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        _showResetPasswordDialog(context); // عرض Dialog
+                        _showResetPasswordDialog(context);
                       },
                       child: const Text(
                         'Forgot Password?',
@@ -242,7 +270,7 @@ class _SignInState extends State<SignIn> {
                 ),
                 SizedBox(height: context.screenHeight * 0.02),
                 isLoading
-                    ? const CircularProgressIndicator() // عرض مؤشر التحميل
+                    ? const CircularProgressIndicator()
                     : Button(
                         onTap: signInMetode,
                         buttonText: 'Sign In',
@@ -286,7 +314,7 @@ class _SignInState extends State<SignIn> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red, // لون الخلفية للرسالة
+        backgroundColor: Colors.red,
       ),
     );
   }

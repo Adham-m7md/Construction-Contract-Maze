@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:maze/helper/widgets/constants.dart';
 import 'package:maze/pages/info_page.dart';
 import 'package:maze/pages/qestions_page.dart';
+import 'package:maze/pages/sign_in_page.dart';
 import 'package:maze/pages/videos_page.dart';
 
 final fireStore = FirebaseFirestore.instance;
@@ -48,6 +49,9 @@ class _HomePageState extends State<HomePage> {
         leading: IconButton(
             onPressed: () {
               FirebaseAuth.instance.signOut();
+              if (mounted) {
+                Navigator.of(context).pushReplacementNamed(SignIn.id);
+              }
             },
             icon: const Icon(
               Icons.logout,
@@ -81,8 +85,8 @@ class _HomePageState extends State<HomePage> {
         selectedFontSize: 17,
         selectedItemColor: kPrimaryColor,
         showUnselectedLabels: false,
-        items: [
-          const BottomNavigationBarItem(
+        items: const [
+          BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined), label: 'Home'),
           BottomNavigationBarItem(
               icon: Icon(Icons.play_arrow_outlined), label: 'Videos')

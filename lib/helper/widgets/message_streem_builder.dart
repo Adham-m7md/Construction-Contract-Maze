@@ -21,7 +21,6 @@ class _MessageStreamBuilderState extends State<MessageStreamBuilder> {
           .orderBy('timestamp', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
-        // Show empty container instead of loading indicator
         if (!snapshot.hasData) {
           return Container();
         }
@@ -34,11 +33,13 @@ class _MessageStreamBuilderState extends State<MessageStreamBuilder> {
           if (messageData == null) continue;
 
           final messageText = messageData['text'] ?? '';
+          final country = messageData['country'] ?? '';
           final isAdmin = checkIfUserIsAdmin(currentUser);
           final answer = messageData['answer'];
 
           messageWidgets.add(QuestionUserMessage(
             text: messageText,
+            country: country,
             answer: answer,
             isAdmin: isAdmin,
             messageId: message.id,
@@ -54,12 +55,10 @@ class _MessageStreamBuilderState extends State<MessageStreamBuilder> {
     );
   }
 
-  // دالة للتحقق من أن المستخدم هو الأدمن
   bool checkIfUserIsAdmin(User? user) {
     return user != null && user.email == '4@test.com';
   }
 
-  // دالة لحذف الرسالة
   Future<void> _deleteMessage(String messageId) async {
     await FirebaseFirestore.instance
         .collection('messages')
