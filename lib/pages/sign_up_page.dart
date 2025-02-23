@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:maze/helper/widgets/CustomButton.dart';
 import 'package:maze/helper/widgets/CustomTextFeild.dart';
 import 'package:maze/helper/widgets/constants.dart';
+import 'package:maze/helper/widgets/drop_down_button_form_feild.dart';
 import 'package:maze/pages/auth.dart';
 import 'package:maze/pages/sign_in_page.dart';
 import 'package:maze/utils/app_directions.dart';
@@ -18,31 +19,27 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  final _formKey = GlobalKey<FormState>(); // مفتاح لإدارة حالة النموذج
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
 
+  String? selectedJobTitle; // لتخزين عنوان الوظيفة المحدد
+  bool _obscureText = true;
   bool isLoading = false;
 
-  // دالة للتحقق من صحة رقم الهاتف
   bool isValidPhoneNumber(String phone) {
-    // Regex للتحقق من أن الرقم يتكون من 11 رقمًا ويبدأ بـ 01
     final regex = RegExp(r'^01[0-9]{9}$');
     return regex.hasMatch(phone);
   }
 
-  // دالة للتحقق من صحة كلمة المرور
   bool isValidPassword(String password) {
-    // التحقق من أن كلمة المرور تحتوي على 6 أحرف/أرقام على الأقل
     return password.length >= 6;
   }
 
   Future<void> signUpMetode() async {
-    // تشغيل الفاليديتور يدويًا عند الضغط على الزر
     if (_formKey.currentState!.validate()) {
-      // إذا كانت جميع الحقول صحيحة
       setState(() {
         isLoading = true;
       });
@@ -61,6 +58,7 @@ class _SignUpState extends State<SignUp> {
           'name': _nameController.text.trim(),
           'phone': _phoneController.text.trim(),
           'email': _emailController.text.trim(),
+          'job_title': selectedJobTitle, // إضافة عنوان الوظيفة المحدد
           'created_at': FieldValue.serverTimestamp(),
         });
 
@@ -98,11 +96,11 @@ class _SignUpState extends State<SignUp> {
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: Form(
           key: _formKey,
-          autovalidateMode: AutovalidateMode.disabled, // تعطيل التحقق التلقائي
+          autovalidateMode: AutovalidateMode.disabled,
           child: SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(height: context.screenHeight * 0.08),
+                SizedBox(height: context.screenHeight * 0.07),
                 Image.asset(
                   kLogo,
                   height: context.screenHeight * 0.3,
@@ -138,7 +136,16 @@ class _SignUpState extends State<SignUp> {
                     return null;
                   },
                 ),
-                SizedBox(height: context.screenHeight * 0.02),
+                SizedBox(height: context.screenHeight * 0.01),
+                DropDownButtonFormFeild(
+                  selectedJobTitle: selectedJobTitle,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedJobTitle = newValue; // تحديث القيمة عند الاختيار
+                    });
+                  },
+                ),
+                SizedBox(height: context.screenHeight * 0.01),
                 TextFormFeild(
                   hintText: 'Phone',
                   onChanged: (data) {
@@ -157,7 +164,7 @@ class _SignUpState extends State<SignUp> {
                     return null;
                   },
                 ),
-                SizedBox(height: context.screenHeight * 0.02),
+                SizedBox(height: context.screenHeight * 0.01),
                 TextFormFeild(
                   hintText: 'Email',
                   onChanged: (data) {
@@ -177,29 +184,40 @@ class _SignUpState extends State<SignUp> {
                     return null;
                   },
                 ),
-                SizedBox(height: context.screenHeight * 0.014),
+                SizedBox(height: context.screenHeight * 0.01),
                 TextFormFeild(
-                  obscureText: true,
-                  hintText: 'Password',
-                  onChanged: (data) {
-                    setState(() {
-                      _passwordController.text = data;
-                    });
-                  },
-                  controller: _passwordController,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'password is required';
-                    }
-                    if (!isValidPassword(value)) {
-                      return 'not less than 6 letters';
-                    }
-                    return null;
-                  },
-                ),
+                    obscureText: _obscureText,
+                    hintText: 'Password',
+                    onChanged: (data) {
+                      setState(() {
+                        _passwordController.text = data;
+                      });
+                    },
+                    controller: _passwordController,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'password is required';
+                      }
+                      if (!isValidPassword(value)) {
+                        return 'not less than 6 letters';
+                      }
+                      return null;
+                    },
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility : Icons.visibility_off,
+                        color: kPrimaryColor,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText =
+                              !_obscureText; // تبديل حالة إظهار/إخفاء النص
+                        });
+                      },
+                    )),
                 SizedBox(height: context.screenHeight * 0.02),
                 isLoading
-                    ? const CircularProgressIndicator() // عرض مؤشر التحميل
+                    ? const CircularProgressIndicator()
                     : Button(
                         onTap: signUpMetode,
                         buttonText: 'Sign Up',
@@ -244,7 +262,7 @@ class _SignUpState extends State<SignUp> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red, // لون الخلفية للرسالة
+        backgroundColor: Colors.red,
       ),
     );
   }

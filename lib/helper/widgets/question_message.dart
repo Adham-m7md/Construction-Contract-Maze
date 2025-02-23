@@ -5,7 +5,7 @@ class QuestionUserMessage extends StatefulWidget {
   final String? text;
   final String? answer;
   final String? country;
-  final String? username; // إضافة اسم المستخدم
+  final String? uid; // إضافة اسم المستخدم
   final bool isAdmin;
   final String messageId;
   final VoidCallback? onDelete;
@@ -13,7 +13,7 @@ class QuestionUserMessage extends StatefulWidget {
   const QuestionUserMessage({
     super.key,
     this.country,
-    this.username,
+    this.uid,
     this.text,
     this.answer,
     this.isAdmin = false,
@@ -27,6 +27,29 @@ class QuestionUserMessage extends StatefulWidget {
 }
 
 class _QuestionUserMessageState extends State<QuestionUserMessage> {
+  String username = 'Anonymous'; // اسم المستخدم الافتراضي
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsername(); // استرداد اسم المستخدم عند بدء التشغيل
+  }
+
+  Future<void> _fetchUsername() async {
+    if (widget.uid != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          username = userDoc['name']; // تحديث اسم المستخدم
+        });
+      }
+    }
+  }
+
   void _showAnswerDialog() {
     final TextEditingController answerController = TextEditingController();
 
@@ -112,7 +135,7 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Container(); // يمكنك استبدال هذا بعنصر تحميل إذا لزم الأمر
+          return Container();
         }
 
         final messageData = snapshot.data!.data() as Map<String, dynamic>?;

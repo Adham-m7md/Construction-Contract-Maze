@@ -21,6 +21,7 @@ class _SignInState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscureText = true;
 
   bool isLoading = false;
 
@@ -247,6 +248,18 @@ class _SignInState extends State<SignIn> {
                     }
                     return null;
                   },
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                      color: kPrimaryColor,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText =
+                            !_obscureText; // تبديل حالة إظهار/إخفاء النص
+                      });
+                    },
+                  ),
                 ),
                 SizedBox(height: context.screenHeight * 0.02),
                 Row(

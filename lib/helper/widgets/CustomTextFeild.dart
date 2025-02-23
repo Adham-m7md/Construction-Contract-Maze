@@ -11,13 +11,17 @@ class TextFormFeild extends StatelessWidget {
     required this.controller,
     this.validator,
     this.focusNode,
+    this.suffixIcon, // إضافة معلمة prefixIcon
   });
+
   String? hintText;
   bool? obscureText;
   Function(String)? onChanged;
   TextEditingController controller;
   String? Function(String?)? validator;
   FocusNode? focusNode;
+  Widget? suffixIcon; // معلمة prefixIcon
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -36,7 +40,9 @@ class TextFormFeild extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(
-            color: kPrimaryColor, fontSize: 19, fontWeight: FontWeight.bold),
+          color: Colors.black54,
+          fontSize: 19,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
           borderSide: const BorderSide(color: kPrimaryColor),
@@ -54,6 +60,7 @@ class TextFormFeild extends StatelessWidget {
           borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
         errorStyle: const TextStyle(color: Colors.red, fontSize: 14),
+        suffixIcon: suffixIcon, // عرض prefixIcon فقط مع Password Field
       ),
     );
   }

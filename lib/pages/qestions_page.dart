@@ -11,7 +11,7 @@ class QuestionsPages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: const SafeArea(
+      body: SafeArea(
         child: Column(
           children: [
             Expanded(
@@ -115,8 +115,7 @@ class _AddMessageDialogState extends State<AddMessageDialog> {
               FirebaseFirestore.instance.collection('messages').add({
                 'text': messageText,
                 'country': selectedCountry,
-                'username':
-                    currentUser?.displayName ?? 'Anonymous', // اسم المستخدم
+                'uid': currentUser?.uid, // اسم المستخدم
                 'timestamp': FieldValue.serverTimestamp(),
               });
               _messageController.clear();
