@@ -205,13 +205,12 @@ class _SignUpState extends State<SignUp> {
                     },
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureText ? Icons.visibility : Icons.visibility_off,
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
                         color: kPrimaryColor,
                       ),
                       onPressed: () {
                         setState(() {
-                          _obscureText =
-                              !_obscureText; // تبديل حالة إظهار/إخفاء النص
+                          _obscureText = !_obscureText;
                         });
                       },
                     )),

@@ -28,7 +28,6 @@ class _SignInState extends State<SignIn> {
   @override
   void initState() {
     super.initState();
-    // التحقق مما إذا كان المستخدم مسجل دخول بالفعل بطريقة آمنة
     Future.delayed(Duration.zero, () {
       if (mounted && FirebaseAuth.instance.currentUser != null) {
         Navigator.of(context).pushReplacementNamed(QuestionsPages.id);
@@ -95,7 +94,7 @@ class _SignInState extends State<SignIn> {
   }
 
   Future<void> _showResetPasswordDialog(BuildContext context) async {
-    final _resetEmailController = TextEditingController();
+    final resetEmailController = TextEditingController();
 
     return showDialog(
       context: context,
@@ -116,7 +115,7 @@ class _SignInState extends State<SignIn> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
-                controller: _resetEmailController,
+                controller: resetEmailController,
                 decoration: const InputDecoration(
                   hintText: 'Enter Your Email',
                 ),
@@ -142,10 +141,10 @@ class _SignInState extends State<SignIn> {
             ),
             TextButton(
               onPressed: () async {
-                if (_resetEmailController.text.isNotEmpty) {
+                if (resetEmailController.text.isNotEmpty) {
                   try {
                     await FirebaseAuth.instance.sendPasswordResetEmail(
-                      email: _resetEmailController.text.trim(),
+                      email: resetEmailController.text.trim(),
                     );
                     if (mounted) {
                       showSnackBar(context,
@@ -235,7 +234,7 @@ class _SignInState extends State<SignIn> {
                 SizedBox(height: context.screenHeight * 0.014),
                 TextFormFeild(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _obscureText,
                   hintText: 'Password',
                   onChanged: (data) {
                     setState(() {
@@ -250,13 +249,12 @@ class _SignInState extends State<SignIn> {
                   },
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
                       color: kPrimaryColor,
                     ),
                     onPressed: () {
                       setState(() {
-                        _obscureText =
-                            !_obscureText; // تبديل حالة إظهار/إخفاء النص
+                        _obscureText = !_obscureText;
                       });
                     },
                   ),
