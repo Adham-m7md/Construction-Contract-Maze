@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maze/helper/widgets/constants.dart';
+import 'package:maze/core/widgets/constants.dart';
 
 // ignore: must_be_immutable
 class Button extends StatelessWidget {

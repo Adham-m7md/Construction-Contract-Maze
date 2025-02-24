@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:maze/helper/widgets/constants.dart';
+import 'package:maze/core/widgets/constants.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:maze/utils/app_directions.dart';
+import 'package:maze/core/utils/app_directions.dart';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});

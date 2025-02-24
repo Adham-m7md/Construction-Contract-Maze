@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:maze/helper/widgets/CustomButton.dart';
-import 'package:maze/helper/widgets/CustomTextFeild.dart';
-import 'package:maze/helper/widgets/constants.dart';
-import 'package:maze/pages/home_page.dart';
-import 'package:maze/pages/qestions_page.dart';
-import 'package:maze/utils/app_directions.dart';
-import 'package:maze/pages/sign_up_page.dart';
+import 'package:maze/core/widgets/CustomButton.dart';
+import 'package:maze/core/widgets/CustomTextFeild.dart';
+import 'package:maze/core/widgets/constants.dart';
+import 'package:maze/presentation/home/pages/home_page.dart';
+import 'package:maze/presentation/home/pages/qestions_page.dart';
+import 'package:maze/core/utils/app_directions.dart';
+import 'package:maze/presentation/Auth/pages/sign_up_page.dart';
 
 class SignIn extends StatefulWidget {
   static String id = 'Signin';
@@ -47,31 +47,23 @@ class _SignInState extends State<SignIn> {
           password: _passwordController.text.trim(),
         );
 
-        // استخدام pushReplacementNamed بدلاً من pushNamed
         if (mounted) {
-          Navigator.of(context).pushNamed(HomePage.id);
+          Navigator.of(context).pushReplacementNamed(HomePage.id);
         }
       } on FirebaseAuthException catch (e) {
-        String errorMessage;
         switch (e.code) {
           case 'invalid-email':
-            errorMessage = 'البريد الإلكتروني غير صحيح';
             break;
           case 'user-not-found':
-            errorMessage = 'البريد الإلكتروني غير مسجل';
             break;
           case 'wrong-password':
-            errorMessage = 'كلمة المرور غير صحيحة';
             break;
           case 'user-disabled':
-            errorMessage = 'هذا الحساب معطل';
             break;
           case 'invalid-credential':
-            errorMessage = 'كلمة المرور غير صحيحة';
             break;
           case 'account-exists-with-different-credential':
           case 'email-already-in-use':
-            errorMessage = 'أنت مسجل دخول بالفعل';
             break;
           default:
           // errorMessage = 'حدث خطأ أثناء تسجيل الدخول: ${e.message}';

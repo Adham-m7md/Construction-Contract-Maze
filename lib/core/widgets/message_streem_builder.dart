@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:maze/helper/widgets/question_message.dart';
+import 'package:maze/core/widgets/question_message.dart';
 
 class MessageStreamBuilder extends StatefulWidget {
   const MessageStreamBuilder({super.key});

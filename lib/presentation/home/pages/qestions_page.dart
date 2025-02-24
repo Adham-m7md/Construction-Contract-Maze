@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:maze/helper/widgets/constants.dart';
-import 'package:maze/helper/widgets/message_streem_builder.dart';
+import 'package:maze/core/widgets/constants.dart';
+import 'package:maze/core/widgets/message_streem_builder.dart';
 
 class QuestionsPages extends StatelessWidget {
   const QuestionsPages({super.key});

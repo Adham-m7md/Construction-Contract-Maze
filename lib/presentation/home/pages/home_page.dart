@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:maze/helper/widgets/constants.dart';
-import 'package:maze/pages/info_page.dart';
-import 'package:maze/pages/qestions_page.dart';
-import 'package:maze/pages/sign_in_page.dart';
-import 'package:maze/pages/videos_page.dart';
+import 'package:maze/core/widgets/constants.dart';
+import 'package:maze/presentation/home/pages/info_page.dart';
+import 'package:maze/presentation/home/pages/qestions_page.dart';
+import 'package:maze/presentation/Auth/pages/sign_in_page.dart';
+import 'package:maze/presentation/home/pages/videos_page.dart';
 
 final fireStore = FirebaseFirestore.instance;
 

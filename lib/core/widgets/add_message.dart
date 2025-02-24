@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:maze/pages/home_page.dart';
+import 'package:maze/presentation/home/pages/home_page.dart';
 
 // ignore: must_be_immutable
 class AddMessage extends StatefulWidget {

@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:maze/helper/widgets/CustomButton.dart';
-import 'package:maze/helper/widgets/CustomTextFeild.dart';
-import 'package:maze/helper/widgets/constants.dart';
-import 'package:maze/helper/widgets/drop_down_button_form_feild.dart';
-import 'package:maze/pages/auth.dart';
-import 'package:maze/pages/sign_in_page.dart';
-import 'package:maze/utils/app_directions.dart';
+import 'package:maze/core/widgets/CustomButton.dart';
+import 'package:maze/core/widgets/CustomTextFeild.dart';
+import 'package:maze/core/widgets/constants.dart';
+import 'package:maze/core/widgets/drop_down_button_form_feild.dart';
+import 'package:maze/presentation/Auth/pages/auth.dart';
+import 'package:maze/presentation/Auth/pages/sign_in_page.dart';
+import 'package:maze/core/utils/app_directions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUp extends StatefulWidget {

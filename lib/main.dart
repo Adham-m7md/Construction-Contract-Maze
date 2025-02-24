@@ -1,12 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'package:maze/pages/auth.dart';
-import 'package:maze/pages/home_page.dart';
-import 'package:maze/pages/info_page.dart';
-import 'package:maze/pages/sign_in_page.dart';
-import 'package:maze/pages/sign_up_page.dart';
-import 'package:maze/pages/videos_page.dart';
+import 'package:maze/presentation/Auth/pages/auth.dart';
+import 'package:maze/presentation/home/pages/home_page.dart';
+import 'package:maze/presentation/home/pages/info_page.dart';
+import 'package:maze/presentation/Auth/pages/sign_in_page.dart';
+import 'package:maze/presentation/Auth/pages/sign_up_page.dart';
+import 'package:maze/presentation/home/pages/videos_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
