@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:maze/core/helper/show_snack_bar.dart';
 import 'package:maze/core/widgets/CustomButton.dart';
 import 'package:maze/core/widgets/CustomTextFeild.dart';
 import 'package:maze/core/widgets/constants.dart';
+import 'package:maze/presentation/Auth/widgets/dont_have_an_account_widget.dart';
 import 'package:maze/presentation/home/pages/home_page.dart';
 import 'package:maze/presentation/home/pages/qestions_page.dart';
 import 'package:maze/core/utils/app_directions.dart';
-import 'package:maze/presentation/Auth/pages/sign_up_page.dart';
 
 class SignIn extends StatefulWidget {
   static String id = 'Signin';
@@ -37,9 +38,7 @@ class _SignInState extends State<SignIn> {
 
   Future<void> signInMetode() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
+      setState(() => isLoading = true);
 
       try {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -51,37 +50,34 @@ class _SignInState extends State<SignIn> {
           Navigator.of(context).pushReplacementNamed(HomePage.id);
         }
       } on FirebaseAuthException catch (e) {
-        switch (e.code) {
-          case 'invalid-email':
-            break;
-          case 'user-not-found':
-            break;
-          case 'wrong-password':
-            break;
-          case 'user-disabled':
-            break;
-          case 'invalid-credential':
-            break;
-          case 'account-exists-with-different-credential':
-          case 'email-already-in-use':
-            break;
-          default:
-          // errorMessage = 'حدث خطأ أثناء تسجيل الدخول: ${e.message}';
-        }
-        if (mounted) {
-          // showSnackBar(context, errorMessage);
-        }
+        final errorMessage = _handleFirebaseError(e);
+        if (mounted) showSnackBar(context, errorMessage);
       } catch (e) {
-        if (mounted) {
-          // showSnackBar(context, "حدث خطأ غير متوقع: $e");
-        }
+        if (mounted) showSnackBar(context, "An unexpected error occurred: $e");
       } finally {
-        if (mounted) {
-          setState(() {
-            isLoading = false;
-          });
-        }
+        if (mounted) setState(() => isLoading = false);
       }
+    }
+  }
+
+  String _handleFirebaseError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'invalid-email':
+        return "Invalid email format. Please check your email.";
+      case 'user-not-found':
+        return "No account found with this email. Please sign up.";
+      case 'wrong-password':
+        return "Incorrect password. Please check your password and try again.";
+      case 'user-disabled':
+        return "This account has been disabled. Contact support.";
+      case 'invalid-credential':
+        return "the email or password is incorrect, check and try again.";
+      case 'account-exists-with-different-credential':
+        return "An account already exists with this email but different sign-in method.";
+      case 'email-already-in-use':
+        return "This email is already in use by another account.";
+      default:
+        return "Sign-in failed: ${e.message}";
     }
   }
 
@@ -279,45 +275,11 @@ class _SignInState extends State<SignIn> {
                         buttonText: 'Sign In',
                       ),
                 SizedBox(height: context.screenHeight * 0.012),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Don\'t have an account? ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: kBlackColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, SignUp.id);
-                      },
-                      child: const Text(
-                        'SIGN UP',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                const DontHaveAnAccountWidget()
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  void showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
       ),
     );
   }
