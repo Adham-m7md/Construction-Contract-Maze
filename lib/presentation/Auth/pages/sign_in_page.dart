@@ -109,11 +109,11 @@ class _SignInState extends State<SignIn> {
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'البريد الإلكتروني مطلوب';
+                    return 'Email is required';
                   }
                   if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                       .hasMatch(value)) {
-                    return 'البريد الإلكتروني غير صحيح';
+                    return 'this email is incorrect';
                   }
                   return null;
                 },
@@ -135,21 +135,21 @@ class _SignInState extends State<SignIn> {
                       email: resetEmailController.text.trim(),
                     );
                     if (mounted) {
-                      showSnackBar(context,
-                          'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني');
+                      showSnackBar(
+                          context, 'Password reset link sent to your email');
                       Navigator.of(context).pop();
                     }
                   } on FirebaseAuthException catch (e) {
                     if (mounted) {
-                      showSnackBar(context, "حدث خطأ: ${e.message}");
+                      showSnackBar(context, "Error ${e.message}");
                     }
                   } catch (e) {
                     if (mounted) {
-                      showSnackBar(context, "حدث خطأ غير متوقع: $e");
+                      showSnackBar(context, "An unexpected error occurred: $e");
                     }
                   }
                 } else {
-                  showSnackBar(context, 'الرجاء إدخال بريد إلكتروني صحيح');
+                  showSnackBar(context, 'email is incorrect');
                 }
               },
               child: const Text('send'),

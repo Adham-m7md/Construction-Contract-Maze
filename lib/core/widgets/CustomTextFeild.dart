@@ -11,7 +11,7 @@ class TextFormFeild extends StatelessWidget {
     required this.controller,
     this.validator,
     this.focusNode,
-    this.suffixIcon, // إضافة معلمة prefixIcon
+    this.suffixIcon,
   });
 
   String? hintText;
@@ -31,7 +31,7 @@ class TextFormFeild extends StatelessWidget {
       validator: validator ??
           (data) {
             if (data!.isEmpty) {
-              return 'هذا الحقل مطلوب'; // رسالة الخطأ الافتراضية
+              return 'this field is required';
             }
             return null;
           },
@@ -60,7 +60,7 @@ class TextFormFeild extends StatelessWidget {
           borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
         errorStyle: const TextStyle(color: Colors.red, fontSize: 14),
-        suffixIcon: suffixIcon, // عرض prefixIcon فقط مع Password Field
+        suffixIcon: suffixIcon,
       ),
     );
   }

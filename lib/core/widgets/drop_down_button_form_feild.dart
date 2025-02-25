@@ -16,6 +16,13 @@ class DropDownButtonFormFeild extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
+      hint: const Text(
+        'Job Title',
+        style: TextStyle(
+          color: Colors.black54,
+          fontSize: 19,
+        ),
+      ),
       borderRadius: BorderRadius.circular(24), // نصف قطر الحدود
       value: selectedJobTitle, // القيمة المحددة
       onChanged: onChanged, // تحديث القيمة عند الاختيار
@@ -32,18 +39,17 @@ class DropDownButtonFormFeild extends StatelessWidget {
           child: Text(
             value,
             style: const TextStyle(
-              color: kBlackColor, // لون النص داخل القائمة المنسدلة
-              fontSize: 19, // حجم النص داخل القائمة المنسدلة
-            ),
+                fontSize: 16,
+                color: Colors.black87 // حجم النص داخل القائمة المنسدلة
+                ),
           ),
         );
       }).toList(),
       decoration: InputDecoration(
-        hintText: 'Job Title',
+        hintText: '',
         hintStyle: const TextStyle(
-          color: kPrimaryColor, // لون النص التلميحي
-          fontSize: 19, // حجم النص التلميحي
-          fontWeight: FontWeight.bold, // وزن النص التلميحي
+          color: Colors.black54,
+          fontSize: 19,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24), // نصف قطر الحدود

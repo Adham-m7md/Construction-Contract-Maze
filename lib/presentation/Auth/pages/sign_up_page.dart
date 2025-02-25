@@ -6,9 +6,9 @@ import 'package:maze/core/widgets/CustomTextFeild.dart';
 import 'package:maze/core/widgets/constants.dart';
 import 'package:maze/core/widgets/drop_down_button_form_feild.dart';
 import 'package:maze/presentation/Auth/pages/auth.dart';
-import 'package:maze/presentation/Auth/pages/sign_in_page.dart';
 import 'package:maze/core/utils/app_directions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:maze/presentation/Auth/widgets/have_an_account_widget.dart';
 
 class SignUp extends StatefulWidget {
   static String id = 'Signup';
@@ -26,7 +26,7 @@ class _SignUpState extends State<SignUp> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
 
-  String? selectedJobTitle; // لتخزين عنوان الوظيفة المحدد
+  String? selectedJobTitle;
   bool _obscureText = true;
   bool isLoading = false;
 
@@ -157,13 +157,18 @@ class _SignUpState extends State<SignUp> {
                 ),
                 SizedBox(height: context.screenHeight * 0.01),
                 DropDownButtonFormFeild(
-                  selectedJobTitle: selectedJobTitle,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedJobTitle = newValue; // تحديث القيمة عند الاختيار
-                    });
-                  },
-                ),
+                    selectedJobTitle: selectedJobTitle,
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedJobTitle = newValue;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a job title';
+                      }
+                      return null;
+                    }),
                 SizedBox(height: context.screenHeight * 0.01),
                 TextFormFeild(
                   hintText: 'Phone',
@@ -198,7 +203,7 @@ class _SignUpState extends State<SignUp> {
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                         .hasMatch(value)) {
-                      return 'البريد الإلكتروني غير صحيح';
+                      return 'ex: youremail@gmail.com';
                     }
                     return null;
                   },
@@ -241,32 +246,7 @@ class _SignUpState extends State<SignUp> {
                         buttonText: 'Sign Up',
                       ),
                 SizedBox(height: context.screenHeight * 0.014),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Already have an account? ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: kBlackColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, SignIn.id);
-                      },
-                      child: const Text(
-                        'SIGN IN',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                const HaveAnAccountWidget(),
                 SizedBox(height: context.screenHeight * 0.06),
               ],
             ),
