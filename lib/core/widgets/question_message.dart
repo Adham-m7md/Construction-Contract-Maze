@@ -5,7 +5,7 @@ class QuestionUserMessage extends StatefulWidget {
   final String? text;
   final String? answer;
   final String? country;
-  final String? uid; // إضافة اسم المستخدم
+  final String? uid; // User ID to fetch the name
   final bool isAdmin;
   final String messageId;
   final VoidCallback? onDelete;
@@ -22,34 +22,37 @@ class QuestionUserMessage extends StatefulWidget {
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _QuestionUserMessageState createState() => _QuestionUserMessageState();
 }
 
 class _QuestionUserMessageState extends State<QuestionUserMessage> {
-  String username = 'Anonymous'; // اسم المستخدم الافتراضي
+  // late String username; // Default username
 
   @override
   void initState() {
+    // username = '';
     super.initState();
-    _fetchUsername(); // استرداد اسم المستخدم عند بدء التشغيل
+    // _fetchUsername(); // Fetch the username when the widget initializes
   }
-
+/* 
   Future<void> _fetchUsername() async {
     if (widget.uid != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.uid)
-          .get();
+      try {
+        // Fetch the user document from Firestore
+        var collection = FirebaseFirestore.instance.collection('users');
+        var docSnapshot = await collection.doc(widget.uid).get();
 
-      if (userDoc.exists) {
-        setState(() {
-          username = userDoc['name']; // تحديث اسم المستخدم
-        });
+        if (docSnapshot.exists) {
+          Map<String, dynamic> data = docSnapshot.data()!;
+          print(data);
+        }
+      } catch (e) {
+        print('Error fetching username: $e');
       }
     }
-  }
+  } */
 
+//FOR ADMIN
   void _showAnswerDialog() {
     final TextEditingController answerController = TextEditingController();
 
@@ -72,7 +75,7 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
                     .doc(widget.messageId)
                     .update({
                   'answer': answerController.text,
-                  'answeredTimestamp': FieldValue.serverTimestamp()
+                  'answeredTimestamp': FieldValue.serverTimestamp(),
                 });
 
                 Navigator.of(context).pop();
@@ -102,7 +105,7 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // إغلاق الـ Dialog
+              Navigator.of(context).pop(); // Close the dialog
             },
             child: const Text('Cancel'),
           ),
@@ -116,7 +119,7 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
                   'answer': editAnswerController.text.trim(),
                 });
 
-                Navigator.of(context).pop(); // إغلاق الـ Dialog
+                Navigator.of(context).pop(); // Close the dialog
               }
             },
             child: const Text('Save'),
@@ -139,9 +142,10 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
         }
 
         final messageData = snapshot.data!.data() as Map<String, dynamic>?;
+        print('messageData: $messageData');
         final answer = messageData?['answer'] ?? '';
-        final username = 'Anonymous'; // اسم المستخدم
-        final country = messageData?['country'] ?? ''; // البلد
+        final country = messageData?['country'] ?? ''; // Country
+        final username = messageData?['name'] ?? '';
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
@@ -173,7 +177,7 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
                               children: [
                                 if (username.isNotEmpty)
                                   Text(
-                                    username,
+                                    username, // Use the fetched username
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -204,8 +208,7 @@ class _QuestionUserMessageState extends State<QuestionUserMessage> {
                         ),
                     ],
                   ),
-                  // عرض اسم المستخدم والبلد
-
+                  // Display the message text
                   Center(
                     child: Text(
                       widget.text ?? '',

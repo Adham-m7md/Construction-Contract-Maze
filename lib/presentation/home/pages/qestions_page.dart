@@ -11,7 +11,8 @@ class QuestionsPages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      backgroundColor: kWhiteColor,
+      body: const SafeArea(
         child: Column(
           children: [
             Expanded(
@@ -46,16 +47,17 @@ class AddMessageDialog extends StatefulWidget {
 
 class _AddMessageDialogState extends State<AddMessageDialog> {
   final _messageController = TextEditingController();
-  String? selectedCountry;
-  final List<String> countries = ['Egypt', 'USA', 'UK', 'Germany', 'France'];
+  final _countryController = TextEditingController();
 
   @override
   void dispose() {
     _messageController.dispose();
+    _countryController.dispose();
+
     super.dispose();
   }
 
-  String? messageText;
+  String? messageText, country;
 
   @override
   Widget build(BuildContext context) {
@@ -83,20 +85,21 @@ class _AddMessageDialogState extends State<AddMessageDialog> {
             ),
           ),
           const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            value: selectedCountry,
-            hint: const Text('Select Country'),
+          TextField(
+            controller: _countryController,
             onChanged: (value) {
-              setState(() {
-                selectedCountry = value;
-              });
+              country = value;
             },
-            items: countries.map((String country) {
-              return DropdownMenuItem<String>(
-                value: country,
-                child: Text(country),
-              );
-            }).toList(),
+            minLines: 1,
+            maxLines: 4,
+            decoration: const InputDecoration(
+              hintText: 'Add your country name',
+              hintStyle: TextStyle(
+                  color: Colors.black45,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
+              border: OutlineInputBorder(),
+            ),
           ),
         ],
       ),
@@ -108,15 +111,20 @@ class _AddMessageDialogState extends State<AddMessageDialog> {
           child: const Text('Cancel'),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             if (messageText != null &&
                 messageText!.isNotEmpty &&
-                selectedCountry != null) {
+                country != null) {
+              DocumentSnapshot userDoc = await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(currentUser?.uid)
+                  .get();
               FirebaseFirestore.instance.collection('messages').add({
                 'text': messageText,
-                'country': selectedCountry,
-                'uid': currentUser?.uid, // اسم المستخدم
+                'country': country,
+                'name': userDoc.get('name') as String,
                 'timestamp': FieldValue.serverTimestamp(),
+                'uid': currentUser?.uid,
               });
               _messageController.clear();
               Navigator.of(context).pop();

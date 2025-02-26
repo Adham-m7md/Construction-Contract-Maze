@@ -14,17 +14,14 @@ class VideosPage extends StatefulWidget {
 }
 
 class _VideosPageState extends State<VideosPage> {
-  // Controllers for the text fields
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _linkController = TextEditingController();
 
   // Firestore instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Firebase Authentication instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Check if the current user is admin
   bool get isAdmin {
     final user = _auth.currentUser;
     return user != null && user.email == '4@test.com';
@@ -94,14 +91,14 @@ class _VideosPageState extends State<VideosPage> {
                   Navigator.of(context).pop();
 
                   // Show a toast message using fluttertoast
-                  Fluttertoast.showToast(
-                    msg: "تمت إضافة الفيديو: $description", // Arabic message
-                    toastLength: Toast.LENGTH_SHORT, // Duration
-                    gravity: ToastGravity.BOTTOM, // Position
-                    backgroundColor: Colors.green, // Background color
-                    textColor: Colors.white, // Text color
-                    fontSize: 16.0, // Font size
-                  );
+                  // Fluttertoast.showToast(
+                  //   msg: "تمت إضافة الفيديو: $description", // Arabic message
+                  //   toastLength: Toast.LENGTH_SHORT, // Duration
+                  //   gravity: ToastGravity.BOTTOM, // Position
+                  //   backgroundColor: Colors.green, // Background color
+                  //   textColor: Colors.white, // Text color
+                  //   fontSize: 16.0, // Font size
+                  // );
                 } else {
                   // Show an error toast if fields are empty
                   Fluttertoast.showToast(
@@ -149,9 +146,6 @@ class _VideosPageState extends State<VideosPage> {
                 }
                 if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
-                }
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text('No videos found.'));
                 }
 
                 final videos = snapshot.data!.docs;
